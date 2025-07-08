@@ -1,0 +1,183 @@
+version: '3'
+
+vars:
+  PROJECT_NAME: sales-crm-system
+
+tasks:
+  # Installation tasks
+  install:
+    desc: Install all dependencies
+    cmds:
+      - task: install:backend
+      - task: install:frontend
+
+  install:backend:
+    desc: Install backend dependencies
+    dir: backend
+    cmds:
+      - pnpm install
+
+  install:frontend:
+    desc: Install frontend dependencies
+    dir: frontend
+    cmds:
+      - pnpm install
+
+  # Development tasks
+  dev:
+    desc: Start all services in development mode
+    deps: [install]
+    cmds:
+      - docker-compose up -d mongodb redis mongo-express
+      - task: dev:backend
+      - task: dev:frontend
+
+  dev:backend:
+    desc: Start backend in development mode
+    dir: backend
+    cmds:
+      - pnpm dev
+
+  dev:frontend:
+    desc: Start frontend in development mode
+    dir: frontend
+    cmds:
+      - pnpm dev
+
+  dev:docker:
+    desc: Start all services using Docker Compose
+    cmds:
+      - docker-compose up
+
+  # Build tasks
+  build:
+    desc: Build all services
+    cmds:
+      - task: build:backend
+      - task: build:frontend
+
+  build:backend:
+    desc: Build backend
+    dir: backend
+    cmds:
+      - pnpm build
+
+  build:frontend:
+    desc: Build frontend
+    dir: frontend
+    cmds:
+      - pnpm build
+
+  # Testing tasks
+  test:
+    desc: Run all tests
+    cmds:
+      - task: test:backend
+      - task: test:frontend
+
+  test:backend:
+    desc: Run backend tests
+    dir: backend
+    cmds:
+      - pnpm test
+
+  test:frontend:
+    desc: Run frontend tests
+    dir: frontend
+    cmds:
+      - pnpm test
+
+  # Linting tasks
+  lint:
+    desc: Run linters on all code
+    cmds:
+      - task: lint:backend
+      - task: lint:frontend
+
+  lint:backend:
+    desc: Lint backend code
+    dir: backend
+    cmds:
+      - pnpm lint
+
+  lint:frontend:
+    desc: Lint frontend code
+    dir: frontend
+    cmds:
+      - pnpm lint
+
+  # Database tasks
+  db:seed:
+    desc: Seed the database with sample data
+    dir: backend
+    cmds:
+      - pnpm run seed
+
+  db:reset:
+    desc: Reset the database
+    cmds:
+      - docker-compose down -v
+      - docker-compose up -d mongodb
+      - sleep 5
+      - task: db:seed
+
+  # Docker tasks
+  docker:build:
+    desc: Build Docker images
+    cmds:
+      - docker-compose build
+
+  docker:up:
+    desc: Start all Docker services
+    cmds:
+      - docker-compose up -d
+
+  docker:down:
+    desc: Stop all Docker services
+    cmds:
+      - docker-compose down
+
+  docker:logs:
+    desc: Show Docker logs
+    cmds:
+      - docker-compose logs -f
+
+  docker:clean:
+    desc: Clean Docker volumes and images
+    cmds:
+      - docker-compose down -v
+      - docker system prune -f
+
+  # Utility tasks
+  clean:
+    desc: Clean all build artifacts and dependencies
+    cmds:
+      - rm -rf backend/node_modules backend/dist
+      - rm -rf frontend/node_modules frontend/.next
+      - rm -rf mobile/build
+
+  setup:
+    desc: Initial project setup
+    cmds:
+      - cp backend/.env.example backend/.env
+      - cp frontend/.env.example frontend/.env
+      - task: install
+      - echo "Project setup complete! Run 'task dev' to start development"
+
+  mobile:init:
+    desc: Initialize Flutter mobile app
+    dir: mobile
+    cmds:
+      - flutter create . --org com.salescrm --project-name sales_crm_mobile
+      - flutter pub get
+
+  # Production tasks
+  prod:build:
+    desc: Build for production
+    cmds:
+      - NODE_ENV=production task build
+
+  prod:start:
+    desc: Start production services
+    cmds:
+      - docker-compose -f docker-compose.prod.yml up -d
