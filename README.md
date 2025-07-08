@@ -188,3 +188,10 @@ Copy `.env.example` files in backend and frontend directories and update with yo
 ## License
 
 Proprietary - All rights reserved
+
+## Deployment Status
+
+[![GitHub](https://img.shields.io/github/license/karthik1729/plax-sales-crm-system)](https://github.com/karthik1729/plax-sales-crm-system)
+[![GitHub last commit](https://img.shields.io/github/last-commit/karthik1729/plax-sales-crm-system)](https://github.com/karthik1729/plax-sales-crm-system/commits/master)
+
+Repository: https://github.com/karthik1729/plax-sales-crm-system
